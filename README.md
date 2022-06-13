@@ -15,11 +15,11 @@ Create a server with the default configuration and start listening for the clien
 
 ```go
 
-	sc, err := ipc.StartServer("<name of socket or pipe>", nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+    sc, err := ipc.StartServer("<name of socket or pipe>", nil)
+    if err != nil {
+        log.Println(err)
+        return
+    }
 
 ```
 
@@ -27,47 +27,45 @@ Create a client and connect to the server:
 
 ```go
 
-	cc, err := ipc.StartClient("<name of socket or pipe>", nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+    cc, err := ipc.StartClient("<name of socket or pipe>", nil)
+    if err != nil {
+        log.Println(err)
+        return
+    }
 
 ```
 Read and write data to the connection:
 
 ```go
-        // write data
-        _ = sc.Write(1, []byte("Message from server"))
 
-        _ = cc.Write(5, []byte("Message from client"))
+    // Write data
+    _ = sc.Write(1, []byte("Message from server"))
 
-
-        // Read data
-        for {
-
-            dataType, data, err := sc.Read()
-
-            if err == nil {
-                log.Println("Server recieved: "+string(data)+" - Message type: ", dataType)
-            } else {
-                log.Println(err)
-                break
-            }
-	    }
+    _ = cc.Write(5, []byte("Message from client"))
 
 
-        for {
+    // Read data
+    for {
+        dataType, data, err := sc.Read()
 
-            dataType, data, err := cc.Read()
+        if err == nil {
+            log.Println("Server recieved: "+string(data)+" - Message type: ", dataType)
+        } else {
+            log.Println(err)
+            break
+        }
+    }
 
-            if err == nil {
-                log.Println("Client recieved: "+string(data)+" - Message type: ", dataType)
-            } else {
-                log.Println(err)
-                break
-            }
-	    }
+    for {
+        dataType, data, err := cc.Read()
+
+        if err == nil {
+            log.Println("Client recieved: "+string(data)+" - Message type: ", dataType)
+        } else {
+            log.Println(err)
+            break
+        }
+    }
 
 ```
 
@@ -80,7 +78,7 @@ Read and write data to the connection:
 ```go
 
     config := &ipc.ServerConfig{Encryption: false}
-	sc, err := ipc.StartServer("<name of socket or pipe>", config)
+    sc, err := ipc.StartServer("<name of socket or pipe>", config)
 
 ```
 
@@ -92,8 +90,8 @@ Read and write data to the connection:
 
 ```go
 
-	config := &ipc.ServerConfig{UnmaskPermissions: true}
-	sc, err := ipc.StartServer("<name of socket or pipe>", config)
+    config := &ipc.ServerConfig{UnmaskPermissions: true}
+    sc, err := ipc.StartServer("<name of socket or pipe>", config)
 
 ```
  Note: Tested on Linux, not tested on Mac, not implemented on Windows.
