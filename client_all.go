@@ -33,6 +33,8 @@ func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 		cc.timeout = 0
 		cc.retryTimer = time.Duration(1)
 		cc.encryptionReq = true
+		cc.network = false
+		cc.networkPort = 9292
 
 	} else {
 
@@ -52,6 +54,18 @@ func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 			cc.encryptionReq = false
 		} else {
 			cc.encryptionReq = true // defualt is to always enforce encryption
+		}
+
+		if config.Network == true {
+			cc.network = true
+		} else {
+			cc.network = false
+		}
+
+		if config.NetworkPort == 0 {
+			cc.networkPort = 9292
+		} else {
+			cc.networkPort = config.NetworkPort
 		}
 	}
 

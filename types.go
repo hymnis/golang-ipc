@@ -20,6 +20,8 @@ type Server struct {
 	maxMsgSize  int
 	enc         *encryption
 	unMask      bool
+	network     bool
+	networkPort int
 }
 
 // Client - holds the details of the client connection and config.
@@ -35,6 +37,8 @@ type Client struct {
 	encryptionReq bool
 	maxMsgSize    int
 	enc           *encryption
+	network       bool
+	networkPort   int
 }
 
 // Message - contains the  recieved message
@@ -76,13 +80,17 @@ type ServerConfig struct {
 	MaxMsgSize        int
 	Encryption        bool
 	UnmaskPermissions bool
+	Network           bool
+	NetworkPort       int
 }
 
 // ClientConfig - used to pass configuation overrides to ClientStart()
 type ClientConfig struct {
-	Timeout    float64
-	RetryTimer time.Duration
-	Encryption bool
+	Timeout     float64
+	RetryTimer  time.Duration
+	Encryption  bool
+	Network     bool
+	NetworkPort int
 }
 
 // Encryption - encryption settings

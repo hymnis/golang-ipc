@@ -30,6 +30,8 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 		sc.maxMsgSize = maxMsgSize
 		sc.encryption = true
 		sc.unMask = false
+		sc.network = false
+		sc.networkPort = 9292
 
 	} else {
 
@@ -56,6 +58,18 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 		} else {
 			sc.unMask = false
 		}
+
+		if config.Network == true {
+			sc.network = true
+		} else {
+			sc.network = false
+		}
+
+		if config.NetworkPort == 0 {
+			sc.networkPort = 9292
+		} else {
+			sc.networkPort = config.NetworkPort
+		}
 	}
 
 	go startServer(sc)
@@ -66,6 +80,7 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 func startServer(sc *Server) {
 
 	err := sc.run()
+
 	if err != nil {
 		sc.recieved <- &Message{err: err, MsgType: -2}
 	}

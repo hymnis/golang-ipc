@@ -2,6 +2,8 @@ package ipc
 
 import (
 	"errors"
+	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -9,22 +11,37 @@ import (
 )
 
 // Server function
-// Create the named pipe (if it doesn't already exist) and start listening for a client to connect.
-// when a client connects and connection is accepted the read function is called on a go routine.
-func (sc *Server) run() error {
-
+func (sc *Server) runSocket() error {
 	var pipeBase = `\\.\pipe\`
 
 	listen, err := winio.ListenPipe(pipeBase+sc.name, nil)
+
 	if err != nil {
 
 		return err
 	}
 
+	return run(listen)
+}
+
+func (sc *Server) runNetwork() error {
+	listen, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
+
+	if err != nil {
+
+		return err
+	}
+
+	return run(listen)
+}
+
+// Create the named pipe (if it doesn't already exist) or tcp endpoint and start listening for a client to connect.
+// when a client connects and connection is accepted the read function is called on a go routine.
+func run(sc *Server, listen *Listener) error {
+
 	sc.listen = listen
 
 	sc.status = Listening
-
 	sc.connChannel = make(chan bool)
 
 	go sc.acceptLoop()
@@ -39,10 +56,10 @@ func (sc *Server) run() error {
 }
 
 // Client function
-// dial - attempts to connect to a named pipe created by the server
+// dial - attempts to connect to a named pipe or tcp endpoint created by the server
 func (cc *Client) dial() error {
 
-	var pipeBase = `\\.\pipe\`
+	var net_type, address string
 
 	startTime := time.Now()
 
@@ -53,7 +70,16 @@ func (cc *Client) dial() error {
 				return errors.New("Timed out trying to connect")
 			}
 		}
-		pn, err := winio.DialPipe(pipeBase+cc.Name, nil)
+
+		if cc.network {
+			net_type = "tcp"
+			address = "0.0.0.0:" + fmt.Sprint(cc.networkPort)
+			pn, err := net.Dial(net_type, address)
+		} else {
+			pipeBase := `\\.\pipe\`
+			pn, err := winio.DialPipe(pipeBase+cc.Name, nil)
+		}
+
 		if err != nil {
 
 			if strings.Contains(err.Error(), "The system cannot find the file specified.") == true {

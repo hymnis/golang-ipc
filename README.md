@@ -1,29 +1,17 @@
 # golang-ipc
- Golang Inter-process communication library for Window, Mac and Linux.
+Golang Inter-process communication library for Window, Mac and Linux.
+
+:fork_and_knife: This is a fork of [james-barrow/golang-ipc](https://github.com/james-barrow/golang-ipc) with some extra TCP sprinkled in.
 
 
- ### Overview
- 
- A simple to use package that uses unix sockets on Macos/Linux and named pipes on Windows to create a communication channel between two go processes.
+### Overview
 
-### Intergration
+A simple to use package that uses unix sockets on MacOS/Linux and named pipes on Windows or TCP endpoint for all OS's to create a communication channel between two go processes.
 
-As well as using this library just for go processes it was also designed to work with other languages, with the go process as the server and the other languages processing being the client.
-
-
-#### NodeJs
-
-I currently use this library to comunicate between a ElectronJs GUI and a go program.
-
-https://github.com/james-barrow/node-ipc-client
-
-#### Python 
-
-To do
 
 ## Usage
 
-Create a server with the default configuation and start listening for the client:
+Create a server with the default configuration and start listening for the client:
 
 ```go
 
@@ -51,13 +39,13 @@ Read and write data to the connection:
 ```go
         // write data
         _ = sc.Write(1, []byte("Message from server"))
-        
+
         _ = cc.Write(5, []byte("Message from client"))
 
 
         // Read data
         for {
-            
+
             dataType, data, err := sc.Read()
 
             if err == nil {
@@ -70,11 +58,11 @@ Read and write data to the connection:
 
 
         for {
-            
+
             dataType, data, err := cc.Read()
 
             if err == nil {
-                log.Println("Client recieved: "+string(data)+" - Message type: ", dataType)     
+                log.Println("Client recieved: "+string(data)+" - Message type: ", dataType)
             } else {
                 log.Println(err)
                 break
@@ -83,20 +71,20 @@ Read and write data to the connection:
 
 ```
 
- ### Encryption
+### Encryption
 
- By default the connection established will be encypted, ECDH384 is used for the key exchange and AES 256 GCM is used for the cipher.
+ By default the connection established will be encrypted, ECDH384 is used for the key exchange and AES 256 GCM is used for the cipher.
 
- Encryption can be swithed off by passing in a custom configuation to the server & client start functions.
+ Encryption can be switched off by passing in a custom configuration to the server & client start functions.
 
 ```go
-    
+
     config := &ipc.ServerConfig{Encryption: false}
 	sc, err := ipc.StartServer("<name of socket or pipe>", config)
 
 ```
 
- ### Unix Socket Permissions
+### Unix Socket Permissions
 
  Under most configurations, a socket created by a user will by default not be writable by another user, making it impossible for the client and server to communicate if being run by separate users.
 
@@ -109,12 +97,25 @@ Read and write data to the connection:
 
 ```
  Note: Tested on Linux, not tested on Mac, not implemented on Windows.
- 
+
+### Network mode
+
+ By default the connection will use socket/named pipes, but when network mode is enabled connection will use TCP.
+
+ It's possible to set the port used by passing in a custom configuration to the server & client start functions.
+
+```go
+
+    config := &ipc.ServerConfig{Network: true, NetworkPort: 9494}
+    sc, err := ipc.StartServer("<name of server>", config)
+
+```
 
 
- ### Testing
+### Testing
 
  The package has been tested on Mac, Windows and Linux and has extensive test coverage.
+
 
 ### Licence
 

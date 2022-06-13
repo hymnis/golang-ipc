@@ -72,6 +72,32 @@ func TestStartUp_Configs(t *testing.T) {
 		t.Error(err)
 	}
 
+	scon.Network = true
+	ccon.Network = true
+
+	_, err9 := StartServer("test", scon)
+	if err9 != nil {
+		t.Error(err2)
+	}
+
+	_, err10 := StartClient("test", ccon)
+	if err10 != nil {
+		t.Error(err)
+	}
+
+	scon.NetworkPort = 9393
+	ccon.NetworkPort = 9393
+
+	_, err11 := StartServer("test", scon)
+	if err11 != nil {
+		t.Error(err2)
+	}
+
+	_, err12 := StartClient("test", ccon)
+	if err12 != nil {
+		t.Error(err)
+	}
+
 	t.Run("Unmask Server Socket Permissions", func(t *testing.T) {
 		scon.UnmaskPermissions = true
 

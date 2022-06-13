@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	ipc "github.com/james-barrow/golang-ipc"
+	ipc "github.com/hymnis/golang-ipc"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 
 func server() {
 
-	//&ipc.ServerConfig{Encryption: false}
+	//config := &ipc.ServerConfig{Encryption: false}
 
 	sc, err := ipc.StartServer("testtest", nil)
 	if err != nil {

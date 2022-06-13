@@ -1,9 +1,11 @@
+//go:build linux || darwin
 // +build linux darwin
 
 package ipc
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"os"
 	"strings"
@@ -11,24 +13,33 @@ import (
 	"time"
 )
 
-// Server create a unix socket and start listening connections - for unix and linux
+// Server create a unix socket or tcp endpoint and start listening for connections - for unix and linux
 func (sc *Server) run() error {
-
-	base := "/tmp/"
-	sock := ".sock"
-
-	if err := os.RemoveAll(base + sc.name + sock); err != nil {
-		return err
-	}
-
 	var oldUmask int
-	if sc.unMask == true {
-		oldUmask = syscall.Umask(0)
+	var net_type, address string
+
+	if sc.network {
+		net_type = "tcp"
+		address = "0.0.0.0:" + fmt.Sprint(sc.networkPort)
+	} else {
+		base := "/tmp/"
+		sock := ".sock"
+
+		if err := os.RemoveAll(base + sc.name + sock); err != nil {
+			return err
+		}
+
+		if sc.unMask == true {
+			oldUmask = syscall.Umask(0)
+		}
+
+		net_type = "unix"
+		address = base + sc.name + sock
 	}
 
-	listen, err := net.Listen("unix", base+sc.name+sock)
+	listen, err := net.Listen(net_type, address)
 
-	if sc.unMask == true {
+	if !sc.network && sc.unMask == true {
 		syscall.Umask(oldUmask)
 	}
 
@@ -53,11 +64,10 @@ func (sc *Server) run() error {
 
 }
 
-// Client connect to the unix socket created by the server -  for unix and linux
+// Client connect to the unix socket or tcp endpoint created by the server - for unix and linux
 func (cc *Client) dial() error {
 
-	base := "/tmp/"
-	sock := ".sock"
+	var net_type, address string
 
 	startTime := time.Now()
 
@@ -69,7 +79,17 @@ func (cc *Client) dial() error {
 			}
 		}
 
-		conn, err := net.Dial("unix", base+cc.Name+sock)
+		if cc.network {
+			net_type = "tcp"
+			address = "0.0.0.0:" + fmt.Sprint(cc.networkPort)
+		} else {
+			base := "/tmp/"
+			sock := ".sock"
+			net_type = "unix"
+			address = base + cc.Name + sock
+		}
+
+		conn, err := net.Dial(net_type, address)
 		if err != nil {
 
 			if strings.Contains(err.Error(), "connect: no such file or directory") == true {
