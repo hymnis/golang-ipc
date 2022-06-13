@@ -15,7 +15,7 @@ import (
 // when a client connects and connection is accepted the read function is called on a go routine.
 func (sc *Server) run() error {
 
-	if sc.Network {
+	if sc.network {
 		listen, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
 	} else {
 		var pipeBase = `\\.\pipe\`
