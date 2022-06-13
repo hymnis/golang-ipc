@@ -11,37 +11,25 @@ import (
 )
 
 // Server function
-func (sc *Server) runSocket() error {
-	var pipeBase = `\\.\pipe\`
-
-	listen, err := winio.ListenPipe(pipeBase+sc.name, nil)
-
-	if err != nil {
-
-		return err
-	}
-
-	return run(listen)
-}
-
-func (sc *Server) runNetwork() error {
-	listen, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
-
-	if err != nil {
-
-		return err
-	}
-
-	return run(listen)
-}
-
 // Create the named pipe (if it doesn't already exist) or tcp endpoint and start listening for a client to connect.
 // when a client connects and connection is accepted the read function is called on a go routine.
-func run(sc *Server, listen *Listener) error {
+func (sc *Server) run() error {
+
+	if sc.Network {
+		listen, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
+	} else {
+		var pipeBase = `\\.\pipe\`
+
+		listen, err := winio.ListenPipe(pipeBase+sc.name, nil)
+	}
+
+	if err != nil {
+		return err
+	}
 
 	sc.listen = listen
-
 	sc.status = Listening
+	sc.recieved <- &Message{Status: sc.status.String(), MsgType: -1}
 	sc.connChannel = make(chan bool)
 
 	go sc.acceptLoop()
