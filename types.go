@@ -8,20 +8,21 @@ import (
 
 // Server - holds the details of the server connection & config.
 type Server struct {
-	name        string
-	listen      net.Listener
-	conn        net.Conn
-	status      Status
-	recieved    chan (*Message)
-	connChannel chan bool
-	toWrite     chan (*Message)
-	timeout     time.Duration
-	encryption  bool
-	maxMsgSize  int
-	enc         *encryption
-	unMask      bool
-	network     bool
-	networkPort int
+	name          string
+	listen        net.Listener
+	conn          net.Conn
+	status        Status
+	recieved      chan (*Message)
+	connChannel   chan bool
+	toWrite       chan (*Message)
+	timeout       time.Duration
+	encryption    bool
+	maxMsgSize    int
+	enc           *encryption
+	unMask        bool
+	network       bool
+	networkPort   int
+	networkListen string
 }
 
 // Client - holds the details of the client connection and config.
@@ -29,7 +30,7 @@ type Client struct {
 	Name          string
 	conn          net.Conn
 	status        Status
-	timeout       float64       //
+	timeout       float64
 	retryTimer    time.Duration // number of seconds before trying to connect again
 	recieved      chan (*Message)
 	toWrite       chan (*Message)
@@ -39,6 +40,7 @@ type Client struct {
 	enc           *encryption
 	network       bool
 	networkPort   int
+	networkServer string
 }
 
 // Message - contains the  recieved message
@@ -82,15 +84,17 @@ type ServerConfig struct {
 	UnmaskPermissions bool
 	Network           bool
 	NetworkPort       int
+	NetworkListen     string
 }
 
 // ClientConfig - used to pass configuation overrides to ClientStart()
 type ClientConfig struct {
-	Timeout     float64
-	RetryTimer  time.Duration
-	Encryption  bool
-	Network     bool
-	NetworkPort int
+	Timeout       float64
+	RetryTimer    time.Duration
+	Encryption    bool
+	Network       bool
+	NetworkPort   int
+	NetworkServer string
 }
 
 // Encryption - encryption settings

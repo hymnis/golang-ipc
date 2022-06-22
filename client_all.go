@@ -35,6 +35,7 @@ func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 		cc.encryptionReq = true
 		cc.network = false
 		cc.networkPort = 9292
+		cc.networkServer = ""
 
 	} else {
 
@@ -66,6 +67,12 @@ func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 			cc.networkPort = 9292
 		} else {
 			cc.networkPort = config.NetworkPort
+		}
+
+		if config.NetworkServer == "" {
+			cc.networkServer = "127.0.0.1"
+		} else {
+			cc.networkServer = config.NetworkServer
 		}
 	}
 

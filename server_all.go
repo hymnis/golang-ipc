@@ -32,6 +32,7 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 		sc.unMask = false
 		sc.network = false
 		sc.networkPort = 9292
+		sc.networkListen = ""
 
 	} else {
 
@@ -69,6 +70,12 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 			sc.networkPort = 9292
 		} else {
 			sc.networkPort = config.NetworkPort
+		}
+
+		if config.NetworkListen == "" {
+			sc.networkListen = "0.0.0.0"
+		} else {
+			sc.networkListen = config.NetworkListen
 		}
 	}
 

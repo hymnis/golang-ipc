@@ -19,8 +19,8 @@ func (sc *Server) run() error {
 	var net_type, address string
 
 	if sc.network {
-		net_type = "tcp"
-		address = "0.0.0.0:" + fmt.Sprint(sc.networkPort)
+		net_type = "tcp4"
+		address = fmt.Sprint(sc.networkListen) + ":" + fmt.Sprint(sc.networkPort)
 	} else {
 		base := "/tmp/"
 		sock := ".sock"
@@ -79,8 +79,8 @@ func (cc *Client) dial() error {
 		}
 
 		if cc.network {
-			net_type = "tcp"
-			address = "0.0.0.0:" + fmt.Sprint(cc.networkPort)
+			net_type = "tcp4"
+			address = fmt.Sprint(cc.networkServer) + ":" + fmt.Sprint(cc.networkPort)
 		} else {
 			base := "/tmp/"
 			sock := ".sock"
