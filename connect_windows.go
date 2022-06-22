@@ -15,12 +15,15 @@ import (
 // when a client connects and connection is accepted the read function is called on a go routine.
 func (sc *Server) run() error {
 
+	var err error
+	var listen net.Listener
+
 	if sc.network {
-		listen, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
+		listen, err = net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
 	} else {
 		var pipeBase = `\\.\pipe\`
 
-		listen, err := winio.ListenPipe(pipeBase+sc.name, nil)
+		listen, err = winio.ListenPipe(pipeBase+sc.name, nil)
 	}
 
 	if err != nil {
@@ -48,6 +51,8 @@ func (sc *Server) run() error {
 func (cc *Client) dial() error {
 
 	var net_type, address string
+	var err error
+	var pn net.Conn
 
 	startTime := time.Now()
 

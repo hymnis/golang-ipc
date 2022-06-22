@@ -47,19 +47,19 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 			sc.maxMsgSize = config.MaxMsgSize
 		}
 
-		if config.Encryption == false {
+		if !config.Encryption {
 			sc.encryption = false
 		} else {
 			sc.encryption = true
 		}
 
-		if config.UnmaskPermissions == true {
+		if config.UnmaskPermissions {
 			sc.unMask = true
 		} else {
 			sc.unMask = false
 		}
 
-		if config.Network == true {
+		if config.Network {
 			sc.network = true
 		} else {
 			sc.network = false
@@ -155,7 +155,7 @@ func (sc *Server) read() {
 	for {
 
 		res := sc.readData(bLen)
-		if res == false {
+		if !res {
 			break
 		}
 
@@ -164,11 +164,11 @@ func (sc *Server) read() {
 		msgRecvd := make([]byte, mLen)
 
 		res = sc.readData(msgRecvd)
-		if res == false {
+		if !res {
 			break
 		}
 
-		if sc.encryption == true {
+		if sc.encryption {
 			msgFinal, err := decrypt(*sc.enc.cipher, msgRecvd)
 			if err != nil {
 				sc.recieved <- &Message{err: err, MsgType: -2}
@@ -235,7 +235,7 @@ func (sc *Server) reConnect() {
 func (sc *Server) Read() (*Message, error) {
 
 	m, ok := (<-sc.recieved)
-	if ok == false {
+	if !ok {
 		return nil, errors.New("the recieve channel has been closed")
 	}
 
@@ -282,7 +282,7 @@ func (sc *Server) write() {
 
 		m, ok := <-sc.toWrite
 
-		if ok == false {
+		if !ok {
 			break
 		}
 
@@ -290,7 +290,7 @@ func (sc *Server) write() {
 
 		writer := bufio.NewWriter(sc.conn)
 
-		if sc.encryption == true {
+		if sc.encryption {
 			toSend = append(toSend, m.Data...)
 			toSendEnc, err := encrypt(*sc.enc.cipher, toSend)
 			if err != nil {
