@@ -50,13 +50,13 @@ func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 			cc.retryTimer = time.Duration(config.RetryTimer)
 		}
 
-		if config.Encryption == false {
+		if !config.Encryption {
 			cc.encryptionReq = false
 		} else {
 			cc.encryptionReq = true // defualt is to always enforce encryption
 		}
 
-		if config.Network == true {
+		if config.Network {
 			cc.network = true
 		} else {
 			cc.network = false
@@ -100,7 +100,7 @@ func (cc *Client) read() {
 	for {
 
 		res := cc.readData(bLen)
-		if res == false {
+		if !res {
 			break
 		}
 
@@ -109,11 +109,11 @@ func (cc *Client) read() {
 		msgRecvd := make([]byte, mLen)
 
 		res = cc.readData(msgRecvd)
-		if res == false {
+		if !res {
 			break
 		}
 
-		if cc.encryption == true {
+		if cc.encryption {
 			msgFinal, err := decrypt(*cc.enc.cipher, msgRecvd)
 			if err != nil {
 				break
@@ -194,7 +194,7 @@ func (cc *Client) reconnect() {
 func (cc *Client) Read() (*Message, error) {
 
 	m, ok := (<-cc.recieved)
-	if ok == false {
+	if !ok {
 		return nil, errors.New("the recieve channel has been closed")
 	}
 
@@ -238,7 +238,7 @@ func (cc *Client) write() {
 
 		m, ok := <-cc.toWrite
 
-		if ok == false {
+		if !ok {
 			break
 		}
 
@@ -246,7 +246,7 @@ func (cc *Client) write() {
 
 		writer := bufio.NewWriter(cc.conn)
 
-		if cc.encryption == true {
+		if cc.encryption {
 			toSend = append(toSend, m.Data...)
 			toSendEnc, err := encrypt(*cc.enc.cipher, toSend)
 			if err != nil {
