@@ -2,7 +2,7 @@ name: Testing
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "feature/*" ]
     paths-ignore:
       - '**.md'
       - '**.sh'
