@@ -67,15 +67,15 @@ func (cc *Client) dial() error {
 		if cc.network {
 			net_type = "tcp"
 			address = "0.0.0.0:" + fmt.Sprint(cc.networkPort)
-			pn, err := net.Dial(net_type, address)
+			pn, err = net.Dial(net_type, address)
 		} else {
 			pipeBase := `\\.\pipe\`
-			pn, err := winio.DialPipe(pipeBase+cc.Name, nil)
+			pn, err = winio.DialPipe(pipeBase+cc.Name, nil)
 		}
 
 		if err != nil {
 
-			if strings.Contains(err.Error(), "The system cannot find the file specified.") == true {
+			if strings.Contains(err.Error(), "The system cannot find the file specified.") {
 
 			} else {
 				return err
@@ -84,11 +84,12 @@ func (cc *Client) dial() error {
 		} else {
 
 			cc.conn = pn
-
 			err = cc.handshake()
+
 			if err != nil {
 				return err
 			}
+
 			return nil
 		}
 
