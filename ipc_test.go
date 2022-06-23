@@ -168,16 +168,40 @@ func TestStartUp_Timeout(t *testing.T) {
 
 }
 
-func TestWrite(t *testing.T) {
+func TestWriteSocket(t *testing.T) {
+	// Using socket/named pipe
+	sc_config := &ServerConfig{
+		Network: false,
+	}
+	cc_config := &ClientConfig{
+		Network: false,
+	}
 
-	sc, err := StartServer("test10", nil)
+	runTestWrite(sc_config, cc_config, t)
+}
+
+func TestWriteNetwork(t *testing.T) {
+	// Using network (TCP)
+	sc_config := &ServerConfig{
+		Network: false,
+	}
+	cc_config := &ClientConfig{
+		Network: false,
+	}
+
+	runTestWrite(sc_config, cc_config, t)
+}
+
+func runTestWrite(sc_config *ServerConfig, cc_config *ClientConfig, t *testing.T) {
+
+	sc, err := StartServer("test10", sc_config)
 	if err != nil {
 		t.Error(err)
 	}
 
 	time.Sleep(time.Second / 4)
 
-	cc, err2 := StartClient("test10", nil)
+	cc, err2 := StartClient("test10", cc_config)
 	if err2 != nil {
 		t.Error(err)
 	}
@@ -254,14 +278,51 @@ func TestWrite(t *testing.T) {
 
 }
 
-func TestRead(t *testing.T) {
+func TestReadSocket(t *testing.T) {
 
+	// Using socket/named pipe
 	sIPC := &Server{
-		name:     "Test",
+		Name:     "Test",
 		status:   NotConnected,
 		recieved: make(chan *Message),
 		timeout:  0,
 	}
+	cIPC := &Client{
+		Name:       "test",
+		timeout:    2,
+		retryTimer: 1,
+		status:     NotConnected,
+		recieved:   make(chan *Message),
+	}
+
+	runTestRead(sIPC, cIPC, t)
+}
+
+func TestReadNetwork(t *testing.T) {
+
+	// Using network (TCP)
+	sIPC := &Server{
+		Name:        "Test",
+		status:      NotConnected,
+		recieved:    make(chan *Message),
+		timeout:     0,
+		network:     true,
+		networkPort: 9393,
+	}
+	cIPC := &Client{
+		Name:        "test",
+		timeout:     2,
+		retryTimer:  1,
+		status:      NotConnected,
+		recieved:    make(chan *Message),
+		network:     true,
+		networkPort: 9393,
+	}
+
+	runTestRead(sIPC, cIPC, t)
+}
+
+func runTestRead(sIPC *Server, cIPC *Client, t *testing.T) {
 
 	sIPC.status = Connected
 
@@ -295,16 +356,7 @@ func TestRead(t *testing.T) {
 	<-serverFinished
 
 	// Client - read tests
-
 	// 3 x client side tests
-	cIPC := &Client{
-		Name:       "test",
-		timeout:    2,
-		retryTimer: 1,
-		status:     NotConnected,
-		recieved:   make(chan *Message),
-	}
-
 	cIPC.status = Connected
 
 	clientFinished := make(chan bool, 1)
