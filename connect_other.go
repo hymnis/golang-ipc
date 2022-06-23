@@ -19,13 +19,13 @@ func (sc *Server) run() error {
 	var net_type, address string
 
 	if sc.network {
-		net_type = "tcp4"
+		net_type = "tcp"
 		address = fmt.Sprint(sc.networkListen) + ":" + fmt.Sprint(sc.networkPort)
 	} else {
 		base := "/tmp/"
 		sock := ".sock"
 
-		if err := os.RemoveAll(base + sc.name + sock); err != nil {
+		if err := os.RemoveAll(base + sc.Name + sock); err != nil {
 			return err
 		}
 
@@ -34,7 +34,7 @@ func (sc *Server) run() error {
 		}
 
 		net_type = "unix"
-		address = base + sc.name + sock
+		address = base + sc.Name + sock
 	}
 
 	listen, err := net.Listen(net_type, address)
@@ -79,7 +79,7 @@ func (cc *Client) dial() error {
 		}
 
 		if cc.network {
-			net_type = "tcp4"
+			net_type = "tcp"
 			address = fmt.Sprint(cc.networkServer) + ":" + fmt.Sprint(cc.networkPort)
 		} else {
 			base := "/tmp/"

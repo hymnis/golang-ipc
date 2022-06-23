@@ -9,7 +9,7 @@ import (
 // StartServer - starts the ipc server.
 //
 // ipcName = is the name of the unix socket or named pipe that will be created.
-// timeout = number of seconds before the socket/pipe times out waiting for a connection/re-cconnection - if -1 or 0 it never times out.
+// config  = is a struct containing the configuration options for the server.
 //
 func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 
@@ -19,7 +19,7 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 	}
 
 	sc := &Server{
-		name:     ipcName,
+		Name:     ipcName,
 		status:   NotConnected,
 		recieved: make(chan *Message),
 		toWrite:  make(chan *Message),
@@ -73,7 +73,7 @@ func StartServer(ipcName string, config *ServerConfig) (*Server, error) {
 		}
 
 		if config.NetworkListen == "" {
-			sc.networkListen = "0.0.0.0"
+			sc.networkListen = ""
 		} else {
 			sc.networkListen = config.NetworkListen
 		}

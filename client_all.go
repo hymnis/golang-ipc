@@ -10,8 +10,7 @@ import (
 // StartClient - start the ipc client.
 //
 // ipcName = is the name of the unix socket or named pipe that the client will try and connect to.
-// timeout = number of seconds before the socket/pipe times out trying to connect/re-cconnect - if -1 or 0 it never times out.
-// retryTimer = number of seconds before the client tries to connect again.
+// config  = is a struct containing the configuration options for the client.
 //
 func StartClient(ipcName string, config *ClientConfig) (*Client, error) {
 

@@ -1,3 +1,4 @@
+// go:build windows
 package ipc
 
 import (
@@ -19,7 +20,7 @@ func (sc *Server) run() error {
 	var listen net.Listener
 
 	if sc.network {
-		listen, err = net.Listen("tcp4", fmt.Sprint(sc.networkListen)+":"+fmt.Sprint(sc.networkPort))
+		listen, err = net.Listen("tcp", fmt.Sprint(sc.networkListen)+":"+fmt.Sprint(sc.networkPort))
 	} else {
 		var pipeBase = `\\.\pipe\`
 
@@ -65,7 +66,7 @@ func (cc *Client) dial() error {
 		}
 
 		if cc.network {
-			net_type = "tcp4"
+			net_type = "tcp"
 			address = fmt.Sprint(cc.networkServer) + ":" + fmt.Sprint(cc.networkPort)
 			pn, err = net.Dial(net_type, address)
 		} else {
