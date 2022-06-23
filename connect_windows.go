@@ -24,7 +24,7 @@ func (sc *Server) run() error {
 	} else {
 		var pipeBase = `\\.\pipe\`
 
-		listen, err = winio.ListenPipe(pipeBase+sc.name, nil)
+		listen, err = winio.ListenPipe(pipeBase+sc.Name, nil)
 	}
 
 	if err != nil {
