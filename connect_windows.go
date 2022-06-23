@@ -1,3 +1,4 @@
+// go:build windows
 package ipc
 
 import (
@@ -19,11 +20,11 @@ func (sc *Server) run() error {
 	var listen net.Listener
 
 	if sc.network {
-		listen, err = net.Listen("tcp", "0.0.0.0:"+fmt.Sprint(sc.networkPort))
+		listen, err = net.Listen("tcp", fmt.Sprint(sc.networkListen)+":"+fmt.Sprint(sc.networkPort))
 	} else {
 		var pipeBase = `\\.\pipe\`
 
-		listen, err = winio.ListenPipe(pipeBase+sc.name, nil)
+		listen, err = winio.ListenPipe(pipeBase+sc.Name, nil)
 	}
 
 	if err != nil {
@@ -66,7 +67,7 @@ func (cc *Client) dial() error {
 
 		if cc.network {
 			net_type = "tcp"
-			address = "0.0.0.0:" + fmt.Sprint(cc.networkPort)
+			address = fmt.Sprint(cc.networkServer) + ":" + fmt.Sprint(cc.networkPort)
 			pn, err = net.Dial(net_type, address)
 		} else {
 			pipeBase := `\\.\pipe\`
